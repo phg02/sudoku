@@ -447,6 +447,40 @@ public class RMIT_Sudoku_Solver {
         List<int[][]> puzzles = readPuzzlesFromFile("hard.txt");
         RMIT_Sudoku_Solver solver = new RMIT_Sudoku_Solver();
 
+        int[][] examplePuzzle = puzzles.get(0);
+
+        long startTime1 = System.nanoTime();
+        int[][] result1 = solver.solveBitManipulation(examplePuzzle);
+        long endTime1 = System.nanoTime();
+        long bitManipulationTime = endTime1 - startTime1;
+
+        long startTime2 = System.nanoTime();
+        int[][] result2 = solver.solveDLX(examplePuzzle);
+        long endTime2 = System.nanoTime();
+        long dlxTime = endTime2 - startTime2;
+
+        long startTime3 = System.nanoTime();
+        int[][] result3 = solver.solveBasicBacktracking(examplePuzzle);
+        long endTime3 = System.nanoTime();
+        long basicBacktrackingTime = endTime3 - startTime3;
+
+        System.out.println("Example Puzzle:");
+        printBoard(examplePuzzle);
+
+        System.out.println("\nBit Manipulation Result:");
+        printBoard(result1);
+        System.out.println("Time taken for Bit Manipulation: " + bitManipulationTime + " nanoseconds");
+
+        System.out.println("\nDLX Result:");
+        printBoard(result2);
+        System.out.println("Time taken for DLX: " + dlxTime + " nanoseconds");
+
+        System.out.println("\nBasic Backtracking Result:");
+        printBoard(result3);
+        System.out.println("Time taken for Basic Backtracking: " + basicBacktrackingTime + " nanoseconds");
+
+        System.out.println();
+
         System.out.println("Solver timing comparison for " + puzzles.size() + " puzzles:");
         System.out
                 .println("===========================================================================================");
