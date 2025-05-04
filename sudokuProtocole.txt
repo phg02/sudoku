@@ -1,0 +1,13 @@
+Testing with Different Sudokus
+
+We define difficulty based on the number of pre-filled clues (known values in the 9×9 grid):
+
+Difficulty  Clues Description
+
+Easy        ≥ 36  Mostly filled, direct logic
+
+Medium      28–35 Balanced mix of logic and trial
+
+Hard        ≤ 27  Requires deeper recursion and pruning
+
+Extreme     ≤ 20  More complex grid, significant branching
