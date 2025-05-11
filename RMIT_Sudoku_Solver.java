@@ -460,7 +460,7 @@ public class RMIT_Sudoku_Solver {
     // ----------------------------------------
 
     public static void main(String[] args) {
-        List<int[][]> puzzles = readPuzzlesFromFile("hard.txt");
+        List<int[][]> puzzles = readPuzzlesFromFile("extreme.txt");
         RMIT_Sudoku_Solver solver = new RMIT_Sudoku_Solver();
         System.out.println("Total puzzles loaded: " + puzzles.size());
 
