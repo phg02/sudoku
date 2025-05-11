@@ -466,20 +466,34 @@ public class RMIT_Sudoku_Solver {
 
         int[][] examplePuzzle = puzzles.get(0);
 
+        Runtime runtime = Runtime.getRuntime();
+
+        runtime.gc();
+        long memBefore1 = runtime.totalMemory() - runtime.freeMemory();
         long startTime1 = System.nanoTime();
         int[][] result1 = solver.solveBitManipulation(examplePuzzle);
         long endTime1 = System.nanoTime();
+        long memAfter1 = runtime.totalMemory() - runtime.freeMemory();
         long bitManipulationTime = endTime1 - startTime1;
+        long bitManipulationMemory = memAfter1 - memBefore1;
 
+        runtime.gc();
+        long memBefore2 = runtime.totalMemory() - runtime.freeMemory();
         long startTime2 = System.nanoTime();
         int[][] result2 = solver.solveDLX(examplePuzzle);
         long endTime2 = System.nanoTime();
+        long memAfter2 = runtime.totalMemory() - runtime.freeMemory();
         long dlxTime = endTime2 - startTime2;
+        long dlxMemory = memAfter2 - memBefore2;
 
+        runtime.gc();
+        long memBefore3 = runtime.totalMemory() - runtime.freeMemory();
         long startTime3 = System.nanoTime();
         int[][] result3 = solver.solveBasicBacktracking(examplePuzzle);
         long endTime3 = System.nanoTime();
+        long memAfter3 = runtime.totalMemory() - runtime.freeMemory();
         long basicBacktrackingTime = endTime3 - startTime3;
+        long basicBacktrackingMemory = memAfter3 - memBefore3;
 
         System.out.println("Example Puzzle:");
         printBoard(examplePuzzle);
@@ -487,14 +501,17 @@ public class RMIT_Sudoku_Solver {
         System.out.println("\nBit Manipulation Result:");
         printBoard(result1);
         System.out.println("Time taken for Bit Manipulation: " + bitManipulationTime + " nanoseconds");
+        System.out.println("Memory used for Bit Manipulation: " + bitManipulationMemory + " bytes");
 
         System.out.println("\nDLX Result:");
         printBoard(result2);
         System.out.println("Time taken for DLX: " + dlxTime + " nanoseconds");
+        System.out.println("Memory used for DLX: " + dlxMemory + " bytes");
 
         System.out.println("\nBasic Backtracking Result:");
         printBoard(result3);
         System.out.println("Time taken for Basic Backtracking: " + basicBacktrackingTime + " nanoseconds");
+        System.out.println("Memory used for Basic Backtracking: " + basicBacktrackingMemory + " bytes");
 
         System.out.println();
 
@@ -513,25 +530,27 @@ public class RMIT_Sudoku_Solver {
         for (int count = 0; count < puzzles.size(); count++) {
             int[][] puzzle = puzzles.get(count);
             SolverResult result = solver.solveAndCompare(puzzle);
-        
-        if (!result.bitManipulationSuccess) System.out.println("Bit failed on puzzle " + (count + 1));
-        if (!result.dlxSuccess) System.out.println("DLX failed on puzzle " + (count + 1));
-        if (!result.basicBacktrackingSuccess) System.out.println("Backtracking failed on puzzle " + (count + 1));
 
+            if (!result.bitManipulationSuccess)
+                System.out.println("Bit failed on puzzle " + (count + 1));
+            if (!result.dlxSuccess)
+                System.out.println("DLX failed on puzzle " + (count + 1));
+            if (!result.basicBacktrackingSuccess)
+                System.out.println("Backtracking failed on puzzle " + (count + 1));
 
-        if (result.solution != null) {
-            double bitTimeMs = result.bitManipulationTime / 1_000_000.0;
-            double dlxTimeMs = result.dlxTime / 1_000_000.0;
-            double basicTimeMs = result.basicBacktrackingTime / 1_000_000.0;
+            if (result.solution != null) {
+                double bitTimeMs = result.bitManipulationTime / 1_000_000.0;
+                double dlxTimeMs = result.dlxTime / 1_000_000.0;
+                double basicTimeMs = result.basicBacktrackingTime / 1_000_000.0;
 
-            System.out.printf("%-6d | %-10.3f %-14d | %-10.3f %-14d | %-10.3f %-14d\n",
-                    count + 1,
-                    bitTimeMs, result.bitManipulationCalls,
-                    dlxTimeMs, result.dlxCalls,
-                    basicTimeMs, result.basicBacktrackingCalls);
-        } else {
-            System.out.printf("%-6d | Unsolvable puzzle (all 3 solvers failed)\n", count + 1);
-        }
+                System.out.printf("%-6d | %-10.3f %-14d | %-10.3f %-14d | %-10.3f %-14d\n",
+                        count + 1,
+                        bitTimeMs, result.bitManipulationCalls,
+                        dlxTimeMs, result.dlxCalls,
+                        basicTimeMs, result.basicBacktrackingCalls);
+            } else {
+                System.out.printf("%-6d | Unsolvable puzzle (all 3 solvers failed)\n", count + 1);
+            }
 
         }
 
@@ -543,6 +562,7 @@ public class RMIT_Sudoku_Solver {
         double totalBitTimeMs = 0, totalDlxTimeMs = 0, totalBasicTimeMs = 0;
         double minBitTime = Double.MAX_VALUE, minDlxTime = Double.MAX_VALUE, minBasicTime = Double.MAX_VALUE;
         double maxBitTime = 0, maxDlxTime = 0, maxBasicTime = 0;
+        long totalBitMemory = 0, totalDlxMemory = 0, totalBasicMemory = 0;
 
         for (int[][] puzzle : puzzles) {
             SolverResult result = solver.solveAndCompare(puzzle);
@@ -556,6 +576,10 @@ public class RMIT_Sudoku_Solver {
             totalBitTimeMs += bitTimeMs;
             totalDlxTimeMs += dlxTimeMs;
             totalBasicTimeMs += basicTimeMs;
+
+            totalBitMemory += result.bitManipulationMemory;
+            totalDlxMemory += result.dlxMemory;
+            totalBasicMemory += result.basicBacktrackingMemory;
 
             // Update min/max values
             minBitTime = Math.min(minBitTime, bitTimeMs);
@@ -579,6 +603,10 @@ public class RMIT_Sudoku_Solver {
                 "Max time (ms)", maxBitTime, maxDlxTime, maxBasicTime);
         System.out.printf("%-20s | %-20f | %-20f | %-20f\n",
                 "Total time (ms)", totalBitTimeMs, totalDlxTimeMs, totalBasicTimeMs);
+        System.out.printf("%-20s | %-20d | %-20d | %-20d\n",
+                "Total memory (bytes)", totalBitMemory, totalDlxMemory, totalBasicMemory);
+        System.out.printf("%-20s | %-20d | %-20d | %-20d\n",
+                "Avg memory (bytes)", totalBitMemory / count, totalDlxMemory / count, totalBasicMemory / count);
 
         // Determine the fastest method
         String fastestMethod;
@@ -597,6 +625,12 @@ public class RMIT_Sudoku_Solver {
         System.out.printf("Bit Manipulation vs DLX:          %.2fx\n", totalDlxTimeMs / totalBitTimeMs);
         System.out.printf("Bit Manipulation vs Backtracking: %.2fx\n", totalBasicTimeMs / totalBitTimeMs);
         System.out.printf("DLX vs Backtracking:             %.2fx\n", totalBasicTimeMs / totalDlxTimeMs);
+
+        // Show memory comparison
+        System.out.println("\nMemory usage comparison (lower is better):");
+        System.out.printf("Bit Manipulation vs DLX:          %.2fx\n", (double) totalDlxMemory / totalBitMemory);
+        System.out.printf("Bit Manipulation vs Backtracking: %.2fx\n", (double) totalBasicMemory / totalBitMemory);
+        System.out.printf("DLX vs Backtracking:             %.2fx\n", (double) totalBasicMemory / totalDlxMemory);
     }
 
     private static void printBoard(int[][] board) {
@@ -615,75 +649,76 @@ public class RMIT_Sudoku_Solver {
     }
 
     private static boolean isValidPuzzle(int[][] puzzle) {
-    boolean[][] rows = new boolean[9][10];
-    boolean[][] cols = new boolean[9][10];
-    boolean[][] boxes = new boolean[9][10];
+        boolean[][] rows = new boolean[9][10];
+        boolean[][] cols = new boolean[9][10];
+        boolean[][] boxes = new boolean[9][10];
 
-    for (int r = 0; r < 9; r++) {
-        for (int c = 0; c < 9; c++) {
-            int num = puzzle[r][c];
-            if (num == 0) continue;
-            int box = (r / 3) * 3 + c / 3;
-            if (rows[r][num] || cols[c][num] || boxes[box][num]) {
-                return false; // Duplicate found
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                int num = puzzle[r][c];
+                if (num == 0)
+                    continue;
+                int box = (r / 3) * 3 + c / 3;
+                if (rows[r][num] || cols[c][num] || boxes[box][num]) {
+                    return false; // Duplicate found
+                }
+                rows[r][num] = cols[c][num] = boxes[box][num] = true;
             }
-            rows[r][num] = cols[c][num] = boxes[box][num] = true;
         }
-    }
-    return true;
+        return true;
     }
 
     public static List<int[][]> readPuzzlesFromFile(String filename) {
-    List<int[][]> puzzles = new ArrayList<>();
-    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-        String line;
-        List<int[]> currentPuzzle = new ArrayList<>();
-        int puzzleNumber = 1;
+        List<int[][]> puzzles = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            List<int[]> currentPuzzle = new ArrayList<>();
+            int puzzleNumber = 1;
 
-        while ((line = br.readLine()) != null) {
-            line = line.trim();
-            if (line.isEmpty()) {
-                if (currentPuzzle.size() == 9) {
-                    int[][] puzzle = currentPuzzle.toArray(new int[9][9]);
-                    if (isValidPuzzle(puzzle)) {
-                        puzzles.add(puzzle);
-                    } else {
-                        System.out.println("Skipping invalid puzzle #" + puzzleNumber);
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    if (currentPuzzle.size() == 9) {
+                        int[][] puzzle = currentPuzzle.toArray(new int[9][9]);
+                        if (isValidPuzzle(puzzle)) {
+                            puzzles.add(puzzle);
+                        } else {
+                            System.out.println("Skipping invalid puzzle #" + puzzleNumber);
+                        }
                     }
+                    currentPuzzle.clear();
+                    puzzleNumber++;
+                    continue;
                 }
-                currentPuzzle.clear();
-                puzzleNumber++;
-                continue;
+
+                String[] parts = line.split("\\s+");
+                if (parts.length != 9) {
+                    System.err.println("Invalid line (not 9 numbers): " + line);
+                    currentPuzzle.clear();
+                    puzzleNumber++;
+                    continue;
+                }
+
+                int[] row = new int[9];
+                for (int i = 0; i < 9; i++) {
+                    row[i] = Integer.parseInt(parts[i]);
+                }
+
+                currentPuzzle.add(row);
             }
 
-            String[] parts = line.split("\\s+");
-            if (parts.length != 9) {
-                System.err.println("Invalid line (not 9 numbers): " + line);
-                currentPuzzle.clear();
-                puzzleNumber++;
-                continue;
+            // Check for last puzzle in case no trailing blank line
+            if (currentPuzzle.size() == 9) {
+                int[][] puzzle = currentPuzzle.toArray(new int[9][9]);
+                if (isValidPuzzle(puzzle)) {
+                    puzzles.add(puzzle);
+                } else {
+                    System.out.println("Skipping invalid puzzle #" + puzzleNumber);
+                }
             }
-
-            int[] row = new int[9];
-            for (int i = 0; i < 9; i++) {
-                row[i] = Integer.parseInt(parts[i]);
-            }
-
-            currentPuzzle.add(row);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Check for last puzzle in case no trailing blank line
-        if (currentPuzzle.size() == 9) {
-            int[][] puzzle = currentPuzzle.toArray(new int[9][9]);
-            if (isValidPuzzle(puzzle)) {
-                puzzles.add(puzzle);
-            } else {
-                System.out.println("Skipping invalid puzzle #" + puzzleNumber);
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    return puzzles;
+        return puzzles;
     }
 }
