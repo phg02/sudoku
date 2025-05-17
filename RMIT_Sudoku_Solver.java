@@ -20,21 +20,30 @@ public class RMIT_Sudoku_Solver {
     private int basicBacktrackingCalls = 0;
 
     // Main solving method as required
-    public int[][] solve(int[][] puzzle) {
+    public int[][] solve(int[][] puzzle, String method) {
         // Try the bit manipulation solver
-        int[][] result = solveBitManipulation(puzzle);
-        if (result != null) {
-            return result;
+
+        int[][] result;
+
+        solveBitManipulation(puzzle);
+        if (method == "recursiveBacktracking") {
+            result = solveBasicBacktracking(puzzle);
+        } else if (method == "bitManipulation") {
+            result = solveBitManipulation(puzzle);
+        } else if (method == "dancingLinks") {
+            result = solveDLX(puzzle);
         }
 
+        else {
+            System.out.println("Invalid method");
+            return null;
+        }
         // If that fails, try the DLX solver
-        result = solveDLX(puzzle);
-        if (result != null) {
-            return result;
+        if (result == null) {
+            System.out.println("Failed to solve puzzle");
+            return null;
         }
-
-        // Last resort - try the basic backtracking solver
-        return solveBasicBacktracking(puzzle);
+        return result;
     }
 
     // Method to evaluate and compare all three solvers
@@ -460,9 +469,12 @@ public class RMIT_Sudoku_Solver {
     // ----------------------------------------
 
     public static void main(String[] args) {
-        List<int[][]> puzzles = readPuzzlesFromFile("extreme.txt");
+        String SudokuDataSet = "extreme.txt";
+        List<int[][]> puzzles = readPuzzlesFromFile(SudokuDataSet);
+
         RMIT_Sudoku_Solver solver = new RMIT_Sudoku_Solver();
-        System.out.println("Total puzzles loaded: " + puzzles.size());
+        System.out.println("Total puzzles loaded from " + SudokuDataSet + ": " + puzzles.size());
+        System.out.println();
 
         int[][] examplePuzzle = puzzles.get(0);
 
@@ -515,7 +527,7 @@ public class RMIT_Sudoku_Solver {
 
         System.out.println();
 
-        System.out.println("Solver timing comparison for " + puzzles.size() + " puzzles:");
+        System.out.println("Solver timing comparison for " + puzzles.size() + " puzzles from " + SudokuDataSet + ":");
         System.out
                 .println("===========================================================================================");
         System.out.printf("%-6s | %-25s | %-25s | %-25s\n",
