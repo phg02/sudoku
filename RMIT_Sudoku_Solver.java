@@ -567,7 +567,7 @@ public class RMIT_Sudoku_Solver {
         }
 
         // Detailed timing summary
-        System.out.println("\nDetailed Timing Summary (milliseconds):");
+        System.out.println("\nDetailed Summary (milliseconds):");
         System.out.println("=======================================================================================");
 
         // Calculate aggregate timing statistics
