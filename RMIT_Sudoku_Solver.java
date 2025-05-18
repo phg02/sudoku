@@ -469,10 +469,24 @@ public class RMIT_Sudoku_Solver {
     // ----------------------------------------
 
     public static void main(String[] args) {
-        String SudokuDataSet = "extreme.txt";
+        // Change the SudokuDataSet variable to load different levels of puzzles
+        // The files should be in the same directory as this Java file
+        String SudokuDataSet = "extreme.txt"; // change level here by changing the file name to easy.txt,
+                                              // medium.txt,hard.txt, extreme.txt
+
         List<int[][]> puzzles = readPuzzlesFromFile(SudokuDataSet);
 
         RMIT_Sudoku_Solver solver = new RMIT_Sudoku_Solver();
+
+        // How to use the solve method
+        // the solve method returns the solved puzzle as a 2D array use the printBoard
+        // method to print the board
+        // solve takes a puzzle and a method name as a string
+        // This is just an example of how to use the solve method
+        // printBoard(solver.solve(puzzles.get(0), "recursiveBacktracking"));
+        // printBoard(solver.solve(puzzles.get(0), "bitManipulation"));
+        // printBoard(solver.solve(puzzles.get(0), "dancingLinks"));
+
         System.out.println("Total puzzles loaded from " + SudokuDataSet + ": " + puzzles.size());
         System.out.println();
 
@@ -567,7 +581,7 @@ public class RMIT_Sudoku_Solver {
         }
 
         // Detailed timing summary
-        System.out.println("\nDetailed Summary (milliseconds):");
+        System.out.println("\nDetailed Summary:");
         System.out.println("=======================================================================================");
 
         // Calculate aggregate timing statistics
